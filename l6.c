@@ -12,7 +12,7 @@
 #define CHAR_START  1
 #define CHAR_END    128
 
-char        filling[PIPEMAX], buf[PIPEMAX];
+char        filling[PIPEMAX], buf[PIPEMAX+1];
 const char  *prog, *file;
 int         oldout, p_err[2], p_out[2];
 struct      pollfd poll_out;
@@ -27,12 +27,12 @@ int test_string(int size, char* input) {
         execl(prog, prog, file, input, NULL);
     }
 
-    poll(&poll_out, 1, TIMEOUT);         // wait a bit for possible haha
+    poll(&poll_out, 1, TIMEOUT);    // wait a bit for possible haha
 
-    read(p_err[0], buf, PIPEMAX-size+1); // flush fill + welcome
-    wait(pid);                           // wait for \n
-    read(p_err[0], buf, size+1);         // flush dots
-    read(p_out[0], buf, TAUNTLEN);       // flush taunt
+    read(p_err[0], buf, PIPEMAX+1); // flush fill + welcome + dots
+    wait(pid);                      // wait for \n
+    read(p_err[0], buf, 1);         // flush \n
+    read(p_out[0], buf, TAUNTLEN);  // flush taunt
     return !(poll_out.revents & POLLIN);
 }
 

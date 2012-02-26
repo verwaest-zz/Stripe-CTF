@@ -56,7 +56,7 @@ int main(int argc, char ** argv) {
     char input[MAXINPUT] = {0};
     int size;
     unsigned char c;
-    for (size = 2; c < CHAR_END && size < MAXINPUT - 1; size++) {
+    for (size = 2; c < CHAR_END && size < MAXINPUT; size++) {
         // fill in extra char to make sure we'll fail
         input[size - 1] = -1;
         for (c = CHAR_START; c < CHAR_END; c++) {

@@ -42,15 +42,14 @@ int main(int argc, char ** argv) {
         exit(-1);
     }
 
-    prog = argv[1];
-    file = argv[2];
+    prog = argv[1]; file = argv[2];
+
     oldout = dup(STDOUT_FILENO);
-    pipe(p_out);
-    dup2(p_out[1], STDOUT_FILENO);
-    pipe(p_err);
-    dup2(p_err[1], STDERR_FILENO);
+    pipe(p_out); dup2(p_out[1], STDOUT_FILENO);
+    pipe(p_err); dup2(p_err[1], STDERR_FILENO);
     poll_out.fd = p_out[0];
     poll_out.events = POLLIN;
+
     memset(filling, 'a', PIPEMAX);
 
     char input[MAXINPUT] = {0};

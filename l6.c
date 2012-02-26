@@ -20,7 +20,7 @@ struct      pollfd poll_out;
 int test_string(int size, char* input) {
     // fill buffer until just enough space for dots of string,
     // stalling to see if haha will be printed
-    write(p_err[1], filling, PIPEMAX - (MSGLEN + size));
+    write(p_err[1], filling, PIPEMAX - (MSGLEN+size-1));
 
     pid_t pid;
     if (!(pid = fork())) {
@@ -29,9 +29,9 @@ int test_string(int size, char* input) {
 
     poll(&poll_out, 1, TIMEOUT);         // wait a bit for possible haha
 
-    read(p_err[0], buf, PIPEMAX - size); // flush fill + welcome
+    read(p_err[0], buf, PIPEMAX-size+1); // flush fill + welcome
     wait(pid);                           // wait for \n
-    read(p_err[0], buf, size + 2);       // flush dots
+    read(p_err[0], buf, size+1);         // flush dots
     read(p_out[0], buf, TAUNTLEN);       // flush taunt
     return !(poll_out.revents & POLLIN);
 }
@@ -56,11 +56,11 @@ int main(int argc, char ** argv) {
     char input[MAXINPUT] = {0};
     int size;
     unsigned char c;
-    for (size = 1; c < CHAR_END && size < MAXINPUT - 1; size++) {
+    for (size = 2; c < CHAR_END && size < MAXINPUT - 1; size++) {
         // fill in extra char to make sure we'll fail
-        input[size] = -1;
+        input[size - 1] = -1;
         for (c = CHAR_START; c < CHAR_END; c++) {
-            input[size-1] = c;
+            input[size - 2] = c;
             if (test_string(size, input)) {
                 break;
             }
@@ -68,7 +68,7 @@ int main(int argc, char ** argv) {
     }
 
     // make it print the pwd to stdout
-    input[size-2] = '\0';
+    input[size-3] = '\0';
     dup2(oldout, STDERR_FILENO);
     execl(prog, prog, file, input, NULL);
 }
